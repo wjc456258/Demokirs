@@ -4,7 +4,7 @@
 #include "GamePlay/KPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "GamePlay/KCharacter.h"
+#include "KPlayerCharacter.h"
 
 void AKPlayerController::BeginPlay()
 {
@@ -20,7 +20,7 @@ void AKPlayerController::BeginPlay()
 void AKPlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
-
+    
     if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
     {
         // 绑定移动事件
@@ -37,32 +37,32 @@ void AKPlayerController::SetupInputComponent()
 
 void AKPlayerController::HandleMove(const FInputActionValue& Value)
 {
-    if (AKCharacter* MyCharacter = Cast<AKCharacter>(GetPawn()))
+    if (AKPlayerCharacter* PlayerCharacter = Cast<AKPlayerCharacter>(GetPawn()))
     {
-        MyCharacter->Move(Value);
+        PlayerCharacter->Move(Value);
     }
 }
 
 void AKPlayerController::HandleJump()
 {
-    if (AKCharacter* MyCharacter = Cast<AKCharacter>(GetPawn()))
+    if (AKPlayerCharacter* PlayerCharacter = Cast<AKPlayerCharacter>(GetPawn()))
     {
-        MyCharacter->Jump();
+        PlayerCharacter->Jump();
     }
 }
 
 void AKPlayerController::HandleStopJump()
 {
-    if (AKCharacter* MyCharacter = Cast<AKCharacter>(GetPawn()))
+    if (AKPlayerCharacter* PlayerCharacter = Cast<AKPlayerCharacter>(GetPawn()))
     {
-        MyCharacter->StopJumping();
+        PlayerCharacter->StopJumping();
     }
 }
 
 void AKPlayerController::HandleLook(const FInputActionValue& Value)
 {
-    if (AKCharacter* MyCharacter = Cast<AKCharacter>(GetPawn()))
+    if (AKPlayerCharacter* PlayerCharacter = Cast<AKPlayerCharacter>(GetPawn()))
     {
-        MyCharacter->Look(Value);
+        PlayerCharacter->Look(Value);
     }
 }
