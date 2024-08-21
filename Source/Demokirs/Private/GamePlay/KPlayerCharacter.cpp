@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KPlayerCharacter.h"
+#include "Gameplay/KPlayerCharacter.h"
 #include "InputActionValue.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"

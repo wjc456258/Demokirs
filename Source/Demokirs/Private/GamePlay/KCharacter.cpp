@@ -21,7 +21,7 @@ void AKCharacter::BeginPlay()
 void AKCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GetMesh()->SetForcedLOD(0);
+	GetMesh()->SetPredictedLODLevel(6);
 	int32 forcelod = GetMesh()->GetForcedLOD();
 	int32 lod = GetMesh()->GetPredictedLODLevel();
 	UE_LOG(LogTemp, Display, TEXT("lod    %d"), lod);

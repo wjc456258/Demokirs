@@ -4,7 +4,7 @@
 #include "GamePlay/KPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "KPlayerCharacter.h"
+#include "Gameplay/KPlayerCharacter.h"
 
 void AKPlayerController::BeginPlay()
 {
