@@ -6,6 +6,12 @@
 #include "GameFramework/Character.h"
 #include "KCharacter.generated.h"
 
+// 用于存储顶点信息的结构体
+struct FVertexInfo
+{
+	FVector WorldPosition;
+	TArray<float> BoneWeights;
+};
 
 UCLASS()
 class DEMOKIRS_API AKCharacter : public ACharacter
@@ -23,5 +29,21 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void InitializeCharacter(float CharacterHeight, float BaseHeight);
+
+	void AdjustSkeletalMesh(USkeletalMeshComponent* SkelMeshComp, float HeightRatio);
+
+	void CacheVertexAndBoneInfo(USkeletalMeshComponent* SkelMeshComp, float HeightRatio, TArray<FVertexInfo>& CachedVertexInfo, TArray<float>& CachedBoneLengths);
+
+	void RestoreVertexInfo(USkeletalMeshComponent* SkelMeshComp, const TArray<FVertexInfo>& CachedVertexInfo);
+
+	void AdjustBoneTransforms(USkeletalMeshComponent* SkelMeshComp, const TArray<float>& CachedBoneLengths);
+
+
+
+	
+
+
 
 };
