@@ -30,6 +30,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void Inittest();
+
 	void InitializeCharacter(float CharacterHeight, float BaseHeight);
 
 	void AdjustSkeletalMesh(USkeletalMeshComponent* SkelMeshComp, float HeightRatio);
@@ -40,10 +43,8 @@ public:
 
 	void AdjustBoneTransforms(USkeletalMeshComponent* SkelMeshComp, const TArray<float>& CachedBoneLengths);
 
-
-
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UTestSkeletalMeshComponent* MeshComp;
 	
-
-
 
 };
