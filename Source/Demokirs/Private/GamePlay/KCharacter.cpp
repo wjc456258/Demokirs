@@ -2,26 +2,40 @@
 
 
 #include "GamePlay/KCharacter.h"
-
+#include "Rendering/SkeletalMeshModel.h"
 // Sets default values
 AKCharacter::AKCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+    
 }
 
 // Called when the game starts or when spawned
 void AKCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+    FSkeletalMeshModel* SkeletalMeshModel = GetMesh()->GetSkeletalMeshAsset()->GetImportedModel();
+    for (int32 LODIndex = 0; LODIndex < SkeletalMeshModel->LODModels.Num(); LODIndex++)
+    {
+        FSkeletalMeshLODModel& LODModel = SkeletalMeshModel->LODModels[LODIndex];
+        for (int32 SectionIndex = 0; SectionIndex < LODModel.Sections.Num(); SectionIndex++)
+        {
+            FSkelMeshSection& SkelMeshSection = LODModel.Sections[SectionIndex];
+            for (int32 VerticeIndex = 0; VerticeIndex < SkelMeshSection.SoftVertices.Num(); VerticeIndex++)
+            {
+                SkelMeshSection.SoftVertices[VerticeIndex].Position = FVector3f(0, 0, 0);
+                UE_LOG(LogTemp, Error, TEXT("SkelMeshSection.SoftVertices[VerticeIndex].Position = %s"), *GetMesh()->GetSkeletalMeshAsset()->GetImportedModel()->LODModels[LODIndex].Sections[SectionIndex].SoftVertices[VerticeIndex].Position.ToString())
+            }
+        }
+    }
 }
 
 // Called every frame
 void AKCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+    
 }
 
 
