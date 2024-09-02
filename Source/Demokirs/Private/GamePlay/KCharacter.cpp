@@ -237,6 +237,27 @@ void AKCharacter::AdjustBoneTransforms(USkeletalMeshComponent* SkelMeshComp, con
     }
 }
 
+void AKCharacter::ApplyBoneTransform(FComponentSpacePoseContext& Output, FTransform& BoneTransform, float BlendWeight, int32 BoneIndex)
+{
+    if (BlendWeight > 0.0f && !BoneTransform.Equals(FTransform::Identity))
+    {
+        //将 int32 类型转换为 FCompactPoseBoneIndex
+        FCompactPoseBoneIndex CompactBoneIndex(BoneIndex);
+        // 将 FTransform 包装成 FBoneTransform
+        FBoneTransform BoneTransformStruct(CompactBoneIndex, BoneTransform);
+
+        // 将 FBoneTransform 放入一个数组中
+        TArray<FBoneTransform> BoneTransforms;
+        BoneTransforms.Add(BoneTransformStruct);
+
+        // 创建 TArrayView 以传递给函数
+        TArrayView<const FBoneTransform> BoneTransformView(BoneTransforms);
+
+        // 调用函数
+        Output.Pose.LocalBlendCSBoneTransforms(BoneTransformView, BlendWeight);
+    }
+}
+
 void GetVertexBoneWeights(const USkinnedMeshComponent* SkinnedMeshComponent, TArray<FVector>& OutVertexPositions, TArray<TArray<FVector2D>>& OutVertexBoneWeights)
 {
     
