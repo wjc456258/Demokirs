@@ -16,6 +16,8 @@ void AKCharacter::BeginPlay()
 {
 	Super::BeginPlay();
     FSkeletalMeshModel* SkeletalMeshModel = GetMesh()->GetSkeletalMeshAsset()->GetImportedModel();
+    TArray<FSoftSkinVertex> SoftSkinVertexs;
+    SoftSkinVertexs.Empty();
     for (int32 LODIndex = 0; LODIndex < SkeletalMeshModel->LODModels.Num(); LODIndex++)
     {
         FSkeletalMeshLODModel& LODModel = SkeletalMeshModel->LODModels[LODIndex];
@@ -24,7 +26,12 @@ void AKCharacter::BeginPlay()
             FSkelMeshSection& SkelMeshSection = LODModel.Sections[SectionIndex];
             for (int32 VerticeIndex = 0; VerticeIndex < SkelMeshSection.SoftVertices.Num(); VerticeIndex++)
             {
-                SkelMeshSection.SoftVertices[VerticeIndex].Position = FVector3f(0, 0, 0);
+                GetMesh()->SetRelativeScale3D(FVector(0.5, 0.5, 0.5));
+                FSoftSkinVertex SoftSkinVertex = SkelMeshSection.SoftVertices[VerticeIndex];
+                UE_LOG(LogTemp, Error, TEXT("SkelMeshSection.SoftVertices[VerticeIndex].Position = %s"), *GetMesh()->GetSkeletalMeshAsset()->GetImportedModel()->LODModels[LODIndex].Sections[SectionIndex].SoftVertices[VerticeIndex].Position.ToString())
+                GetMesh()->SetRelativeScale3D(FVector(1, 1, 1));
+                SkelMeshSection.SoftVertices[VerticeIndex] = SoftSkinVertex;
+                //SoftSkinVertexs.Add(SoftSkinVertex)
                 UE_LOG(LogTemp, Error, TEXT("SkelMeshSection.SoftVertices[VerticeIndex].Position = %s"), *GetMesh()->GetSkeletalMeshAsset()->GetImportedModel()->LODModels[LODIndex].Sections[SectionIndex].SoftVertices[VerticeIndex].Position.ToString())
             }
         }
