@@ -43,8 +43,6 @@ public:
 
 	void AdjustBoneTransforms(USkeletalMeshComponent* SkelMeshComp, const TArray<float>& CachedBoneLengths);
 
-	void ApplyBoneTransform(FComponentSpacePoseContext& Output, FTransform& BoneTransform, float BlendWeight, int32 BoneIndex);
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UTestSkeletalMeshComponent* MeshComp;
 	
