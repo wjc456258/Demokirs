@@ -8,21 +8,26 @@
 AKCharacter::AKCharacter()
 {
     PrimaryActorTick.bCanEverTick = true;
-    
+    //MeshComp = CreateDefaultSubobject<UTestSkeletalMeshComponent>(TEXT("CustomMesh"));
+    //MeshComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
 void AKCharacter::BeginPlay()
 {
     Super::BeginPlay();
-   
+    //MeshComp->SetComponentTickEnabled(false);
+    // 调整角色的身高
+    // 假设基准身高是180，目标身高是100
+    FTimerHandle UnusedHandle;
     GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AKCharacter::Inittest);
 }
 
 void AKCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    //InitializeCharacter(50, 180);
+    //InitializeCharacter(100, 180);
+    InitializeCharacter(50, 180);
 }
 
 void AKCharacter::Inittest()
@@ -48,23 +53,100 @@ void AKCharacter::InitializeCharacter(float CharacterHeight, float BaseHeight)
     // 缓存数组
     TArray<FVertexInfo> CachedVertexInfo;
     TArray<float> CachedBoneLengths;
-  
-    
+    //FVector BoneLocation = SkelMeshComp->GetSkeletalMeshAsset()->GetRefSkeleton().GetRefBonePose()[1].GetLocation();
+    //UE_LOG(LogTemp, Error, TEXT("BoneLocation is %s!"), *BoneLocation.ToString());
+    FVector BoneLocation1 = SkelMeshComp->GetBoneTransform(1).GetLocation();
+    UE_LOG(LogTemp, Error, TEXT("BoneLocation1 is %s!"), *BoneLocation1.ToString());
+    //FVector BoneLocation2 = SkelMeshComp->GetComponentTransform(1).GetLocation();
+    //UE_LOG(LogTemp, Error, TEXT("SkeletalMeshComponent is null!"));
     // 调整骨骼缩放比例
-    AdjustSkeletalMesh(SkelMeshComp, HeightRatio);
+    //AdjustSkeletalMesh(SkelMeshComp, HeightRatio);
     
     // 存储所有顶点的世界坐标、骨骼权重、骨骼长度等信息
-    CacheVertexAndBoneInfo(SkelMeshComp, HeightRatio, CachedVertexInfo, CachedBoneLengths);
-   
+    //CacheVertexAndBoneInfo(SkelMeshComp, HeightRatio, CachedVertexInfo, CachedBoneLengths);
+    int32 LODIndex = 0; // 通常是 LOD0，也可以遍历所有 LOD
+    if (SkelMeshComp && SkelMeshComp->GetSkeletalMeshRenderData())
+    {
+        FSkeletalMeshRenderData* SkelMeshRenderData = SkelMeshComp->GetSkeletalMeshRenderData();
+        FSkeletalMeshLODRenderData& LODData = SkelMeshRenderData->LODRenderData[LODIndex];
+
+        for (uint32 i = 0; i < LODData.GetNumVertices(); ++i)
+        {
+            // 获取局部顶点
+            FVector LocalPosition = FVector(LODData.StaticVertexBuffers.PositionVertexBuffer.VertexPosition(i));
+
+            // 转换为世界空间
+            FVector WorldPosition = SkelMeshComp->GetComponentTransform().TransformPosition(LocalPosition * HeightRatio);
+
+            // 获取骨骼权重
+            TArray<float> BoneWeights; // 假设你已经获取了每个顶点的骨骼权重
+
+            // 缓存顶点信息
+            CachedVertexInfo.Add(FVertexInfo{ WorldPosition, BoneWeights });
+        }
+
+        // 缓存骨骼长度信息
+        // 假设你通过一些计算获取了骨骼的世界长度并缓存它们
+        for (int32 BoneIndex = 0; BoneIndex < SkelMeshComp->GetNumBones(); ++BoneIndex)
+        {
+            // 根据骨骼长度和比例缓存数据
+            float BoneLength = SkelMeshComp->GetBoneTransform(BoneIndex).GetLocation().Size();
+            CachedBoneLengths.Add(BoneLength * HeightRatio);
+        }
+    }
     // 步骤3: 将角色的缩放还原为 1.0
-    SkelMeshComp->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+    //SkelMeshComp->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 
     // 将缓存的顶点数据转换回模型空间并覆盖
-    RestoreVertexInfo(SkelMeshComp, CachedVertexInfo);
+    //RestoreVertexInfo(SkelMeshComp, CachedVertexInfo);
 
     // 步骤4: 使用新缓存的骨骼长度，调整 Transform 并重设骨骼长度
-    AdjustBoneTransforms(SkelMeshComp, CachedBoneLengths);
-   
+    //AdjustBoneTransforms(SkelMeshComp, CachedBoneLengths);
+    //for (int32 BoneIndex = 0; BoneIndex < SkelMeshComp->GetNumBones(); ++BoneIndex)
+    //{
+    //    FTransform BoneTransform = SkelMeshComp->GetBoneTransform(BoneIndex);
+
+    //    // 使用缓存的骨骼长度调整偏移
+    //    FVector AdjustedBonePosition = BoneTransform.GetLocation().GetSafeNormal() * CachedBoneLengths[BoneIndex];
+
+    //    // 设置新的骨骼位置
+    //    BoneTransform.SetLocation(AdjustedBonePosition);
+
+    //    // 更新骨骼变换
+    //    //SkelMeshComp->SetBoneTransformByName(SkelMeshComp->GetBoneName(BoneIndex), BoneTransform, EBoneSpaces::ComponentSpace);
+    //    SkelMeshComp->BoneSpaceTransforms[BoneIndex] = BoneTransform;
+    //}
+    //FReferenceSkeleton& RefSkeleton = GetMesh()->SkeletalMesh->GetRefSkeleton();
+    //FReferenceSkeletonModifier RefSkelModifier(RefSkeleton, GetMesh()->SkeletalMesh->GetSkeleton());
+    //int32 NumBones = RefSkeleton.GetNum(); // 获取骨骼总数
+
+    //for (int32 BoneIndex = 0; BoneIndex < NumBones; ++BoneIndex)
+    //{
+    //    if (BoneIndex >= 0 && BoneIndex < NumBones)
+    //    {
+    //        // 这里的 BoneIndex 是有效的，可以进行安全的操作
+    //        FTransform BoneTransform = GetMesh()->SkeletalMesh->GetRefSkeleton().GetRefBonePose()[BoneIndex];
+    //        BoneTransform.SetLocation(BoneTransform.GetLocation()*0.4);
+    //        // 进行骨骼变换修改
+
+    //        RefSkelModifier.UpdateRefPoseTransform(BoneIndex, BoneTransform);
+    //    }
+    //    else
+    //    {
+    //        // BoneIndex 无效，输出警告或错误信息
+    //        UE_LOG(LogTemp, Warning, TEXT("Invalid BoneIndex: %d"), BoneIndex);
+    //    }
+    //}
+    //GetMesh()->SkeletalMesh->PostEditChange();
+    //GetMesh()->SkeletalMesh->MarkPackageDirty();
+   /* FTransform BoneTransform;
+    BoneTransform.SetLocation(FVector(0, 0, 0));
+    BoneTransform.SetTranslation(FVector(0, 0, 0));
+    SkelMeshComp->GetEditableComponentSpaceTransforms()[1].SetLocation(BoneTransform.GetLocation());
+    BoneLocation = SkelMeshComp->GetSkeletalMeshAsset()->GetRefSkeleton().GetRefBonePose()[1].GetLocation();
+    UE_LOG(LogTemp, Error, TEXT("BoneLocation is %s!"), *BoneLocation.ToString());
+    BoneLocation1 = SkelMeshComp->GetBoneTransform(1).GetLocation();
+    UE_LOG(LogTemp, Error, TEXT("BoneLocation1 is %s!"), *BoneLocation1.ToString());*/
     // 步骤5: 保持顶点与骨骼的权重关系不变
 
     // 步骤6: 将调整后的 SKM 作为最终的 SKM，清理缓存数据并显示出来
